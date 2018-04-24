@@ -9,8 +9,8 @@ public class IMAK_Distortion
     {
         Num_Ver = 0;
         Num_Tri = 0;
-		for (int i = 0; i < 4; ++i)
-			GPU_Comm [i] = 0f;
+        for (int i = 0; i < 4; ++i)
+            GPU_Comm [i] = 0f;
     }
 
     public void Initialize(GameObject obj)
@@ -28,32 +28,35 @@ public class IMAK_Distortion
 
     // Draw Animation
     internal MeshRenderer Tar;
-	internal float[] GPU_Comm = new float[4];
+    internal float[] GPU_Comm = new float[4];
     public void Breath(float clock, float magnitude, float freq)
     {
         float shift = (magnitude * Mathf.Sin(clock*freq) - 0.8f*magnitude) / 2;
-		GPU_Comm[0] = shift;
+        GPU_Comm[0] = shift;
     }
 
-	public void blink(float clock, float start_time, float freq)
-	{
-		float overtime = clock - start_time;
-		if (overtime > freq)
-			GPU_Comm[1] = 0f;
-		else {
-			GPU_Comm[1] = Mathf.Sin(overtime*freq);
-		}
+    public void blink(float clock, int start_time, float freq)
+    {
+        float overtime = clock % start_time;
+        Debug.Log(overtime.ToString());
+        if (0.5f<overtime && overtime< 2.5f)
+        {
+            GPU_Comm[1] = 0.01f/1.5f * (Mathf.Sin(overtime*Mathf.PI)-1f);
+        }
+        else
+        {
+            GPU_Comm[1] = 0;
+        }
 
-		GPU_Comm[1] = 0.01f*Mathf.Sin(clock*3.0f);
-	}
+    }
 
-	public void Send_GPU_Command(){
-		Tar.material.SetFloat("command1", GPU_Comm[0]);
-		Tar.material.SetFloat("command2", GPU_Comm[1]);
+    public void Send_GPU_Command(){
+        Tar.material.SetFloat("command1", GPU_Comm[0]);
+        Tar.material.SetFloat("command2", GPU_Comm[1]);
 
-		for (int i = 0; i < 4; ++i)
-			GPU_Comm [i] = 0f;
-	}
+        for (int i = 0; i < 4; ++i)
+            GPU_Comm [i] = 0f;
+    }
 
     // Set Texture
     public void SetMaterial(string mat_name)
@@ -71,13 +74,13 @@ public class IMAK_Distortion
     {
         Shader Disort_shader = Resources.Load<Shader>("DistortionShader");
         Material mat = new Material(Disort_shader);
-		Tex = Resources.Load<Texture>(file_name);
-		mat.SetTexture("_MainTex", Tex);
+        Tex = Resources.Load<Texture>(file_name);
+        mat.SetTexture("_MainTex", Tex);
         Tar = Distort_Anime.GetComponent<MeshRenderer>();
         Tar.material = mat;
 
 
-		rt = new RenderTexture (Tex.width,Tex.height,0);
+        rt = new RenderTexture (Tex.width,Tex.height,0);
 
         // Save Efficiency
         Tar.receiveShadows = false;
@@ -114,7 +117,7 @@ public class IMAK_Distortion
             // Get Vertices Info
             Vector3[] ver_coord = new Vector3[Num_Ver];
             Vector2[] ver_uv = new Vector2[Num_Ver];
-			Vector3[] ver_nor = new Vector3[Num_Ver];
+            Vector3[] ver_nor = new Vector3[Num_Ver];
             Color[] ver_color = new Color[Num_Ver];
 
             int l_ind = 1;
@@ -124,15 +127,15 @@ public class IMAK_Distortion
                 // x,y,(z),u,v,r,g,(b)
                 int V_ind = l_ind - 1;
                 ver_coord[V_ind][0] = Convert.ToSingle(Info[0])*10f-5f;
-				ver_coord[V_ind][1] = -Convert.ToSingle(Info[1])*10f+5f;
-				ver_coord[V_ind][2] = Z;
+                ver_coord[V_ind][1] = -Convert.ToSingle(Info[1])*10f+5f;
+                ver_coord[V_ind][2] = Z;
 
                 ver_uv[V_ind][0] = Convert.ToSingle(Info[2]);
                 ver_uv[V_ind][1] = Convert.ToSingle(Info[3]);
 
-				ver_nor[V_ind][2] = Convert.ToSingle(Info[4]); // Group
-				ver_nor[V_ind][0] = Convert.ToSingle(Info[5]); // dir_x
-				ver_nor[V_ind][1] = Convert.ToSingle(Info[6]); // dir_y
+                ver_nor[V_ind][2] = Convert.ToSingle(Info[4]); // Group
+                ver_nor[V_ind][0] = Convert.ToSingle(Info[5]); // dir_x
+                ver_nor[V_ind][1] = Convert.ToSingle(Info[6]); // dir_y
 
                 ver_color[V_ind].r = 0;
                 ver_color[V_ind].g = 0;
@@ -145,7 +148,7 @@ public class IMAK_Distortion
             Distort_Anime.GetComponent<MeshFilter>().mesh.vertices = ver_coord;
             Distort_Anime.GetComponent<MeshFilter>().mesh.uv = ver_uv;
             Distort_Anime.GetComponent<MeshFilter>().mesh.colors = ver_color;
-			Distort_Anime.GetComponent<MeshFilter>().mesh.normals = ver_nor;
+            Distort_Anime.GetComponent<MeshFilter>().mesh.normals = ver_nor;
 
             // Get Triangles Info
             int[] Tri = new int[Num_Tri * 3];
@@ -174,19 +177,19 @@ public class IMAK_Distortion
     }
 
 
-	// Direct Render from Material without camera
-	private RenderTexture rt;
-	private Texture Tex;
-	private Texture2D RenderTo;
+    // Direct Render from Material without camera
+    private RenderTexture rt;
+    private Texture Tex;
+    private Texture2D RenderTo;
 
-	public void SetRenderTarget(ref Texture2D texture){
-		texture = new Texture2D (Tex.width, Tex.height);
-		RenderTo = texture;
-	}
+    public void SetRenderTarget(ref Texture2D texture){
+        texture = new Texture2D (Tex.width, Tex.height);
+        RenderTo = texture;
+    }
 
-	public void GetFrame(){
-		Graphics.Blit (Tex, rt, Tar.material, 0);
-		RenderTo.ReadPixels (new Rect (0, 0, rt.width, rt.height), 0, 0);
-		RenderTo.Apply ();
-	}
+    public void GetFrame(){
+        Graphics.Blit (Tex, rt, Tar.material, 0);
+        RenderTo.ReadPixels (new Rect (0, 0, rt.width, rt.height), 0, 0);
+        RenderTo.Apply ();
+    }
 }

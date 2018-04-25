@@ -9,13 +9,13 @@ public class Distort_Test : MonoBehaviour {
 
     // Use this for initialization
     internal IMAK_Distortion distortion_map1 = new IMAK_Distortion();
-
     public float breathFreq = 1f;
-    public float blinkFreq = 1f;
-    public float breathMagnitude = 0.17f;
+    public float breathMagnitude = 0.1f;
+    public float blinkFreq = 0.8f;
+    public float blinkMagnitude = 1f;
     public string filename;
 
-    Vector3[] ver;
+	Vector3[] ver;
     void Start () {
         // = GameObject.Find("Distort1");
         distortion_map1.Initialize(this.gameObject);
@@ -25,13 +25,14 @@ public class Distort_Test : MonoBehaviour {
 
     }
 
-    // Update is called once per frame
-    void Update () {
+	// Update is called once per frame
+	void Update () {
         time_clock = Time.time;
-        //distortion_map1.Distort_Anime.GetComponent<MeshFilter> ().mesh.vertices[5].x += 1f;
-        distortion_map1.Breath(time_clock, breathMagnitude, breathFreq);
-        distortion_map1.blink (time_clock, 5, blinkFreq);
-        distortion_map1.Send_GPU_Command();
+		//distortion_map1.Distort_Anime.GetComponent<MeshFilter> ().mesh.vertices[5].x += 1f;
+		distortion_map1.Breath(time_clock, breathMagnitude, breathFreq);
+		float blink_time = time_clock - time_clock%(2.0f);
+		distortion_map1.blink (time_clock, blink_time, blinkFreq, blinkMagnitude);
+		distortion_map1.Send_GPU_Command();
 
     }
 
@@ -39,7 +40,7 @@ public class Distort_Test : MonoBehaviour {
 
     void OnGUI()
     {
-        
+		
     }
 }
 

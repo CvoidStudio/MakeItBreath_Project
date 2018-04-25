@@ -49,6 +49,9 @@
 					v.vertex.x += command1*v.normal.x;
 					v.vertex.y += command1*v.normal.y;
 				}
+				else{
+					v.vertex.y += command1;
+				}
 
 				//o.vertex.x += comm_mag*v.normal.x;
 				//o.vertex.y += comm_mag*v.normal.y;

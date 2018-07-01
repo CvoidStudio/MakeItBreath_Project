@@ -16,9 +16,9 @@ public class Distort_Test : MonoBehaviour {
         Inter = new GameObject();
         // = GameObject.Find("Distort1");
         distortion_map1.Initialize(Inter);
-        distortion_map1.getMeshFromFile("4_ZHM", 10f);
+        distortion_map1.getMeshFromFile("3_ZHM", 10f);
         //distortion_map1.SetMaterial("Distort_Mat");
-        distortion_map1.SetTexture("4");
+        distortion_map1.SetTexture("3");
 
     }
 

@@ -40,18 +40,15 @@ Shader "Custom/DistortionShader" {
 				v2f o;
 
 				// Distortion
-				
-				float dx = mouse_x - v.vertex.x;
+				float center=-0.7;//center of the head,in case 1_HM,center is -0.5; 3_HM : 0.5; 4_HM : -0.7; 
+				float dx = mouse_x - (v.vertex.x-center); 
 				float dy = mouse_y - v.vertex.y;
 				float dist = 0.9f*smoothstep(-4.0,4.0,sqrt(dx*dx + dy*dy));		// linear
-
-				v.vertex.x += (sqrt(v.vertex.z) * dx/dist) / 15.0f;
-				
-				v.vertex.y += (v.vertex.z * dy/dist) / 30.0f;
-
+				v.vertex.x += sqrt(v.vertex.z) * (sqrt(abs(v.vertex.x-center))+0.1)/ 25.0f*-(dx); //make face more "cylinder"
+				v.vertex.x += dx / 15.0f; 
+				v.vertex.y += ((v.vertex.z+0.1) * dy*abs(dy)/dist) / 90.0f; //add a coe 0.1 to make thing more nature
 				o.vertex = UnityObjectToClipPos(v.vertex);
 				
-
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 				o.color = v.color;
 				return o;

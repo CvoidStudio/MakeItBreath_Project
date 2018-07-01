@@ -1,4 +1,6 @@
-﻿Shader "Custom/DistortionShader" {
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Custom/DistortionShader" {
 	Properties
 	{
 		_MainTex ("Texture", 2D) = "white" {}
@@ -47,7 +49,7 @@
 				
 				v.vertex.y += (v.vertex.z * dy/dist) / 30.0f;
 
-				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+				o.vertex = UnityObjectToClipPos(v.vertex);
 				
 
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
